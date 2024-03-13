@@ -19,6 +19,8 @@ export default function Result() {
     users,
     graphData,
     subjectsGraphData,
+    setAttendance,
+    setGraphData,
     setSubjectsGraphData,
   } = useContext(DataContext);
 
@@ -49,7 +51,13 @@ export default function Result() {
   //   }
   // }, []);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    return () => {
+      setGraphData([]);
+      setSubjectsGraphData([]);
+      setAttendance(null);
+    };
+  }, []);
 
   if (attendance == null) {
     return (
