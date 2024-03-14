@@ -10,11 +10,6 @@ import { DataContext } from "./context/DataContext";
 function App() {
   const navigate = useNavigate();
   const { users } = useContext(DataContext);
-  useEffect(() => {
-    if (users.length > 0) {
-      navigate("/home");
-    }
-  }, []);
 
   return (
     <Routes>

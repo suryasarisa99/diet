@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import "./login.scss";
 import axios from "axios";
 import { DataContext } from "../context/DataContext";
@@ -6,7 +6,13 @@ import { useNavigate } from "react-router-dom";
 export default function Login() {
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
-  const { saveUser, SERVER } = useContext(DataContext);
+  const { saveUser, SERVER, users } = useContext(DataContext);
+
+  useEffect(() => {
+    if (users.length > 0) {
+      navigate("/home");
+    }
+  }, []);
 
   const navigate = useNavigate();
   function handleSubmit(e) {

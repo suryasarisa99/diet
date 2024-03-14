@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, {
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+} from "react";
 import { DataContext } from "../context/DataContext";
 import axios from "axios";
 import {
@@ -11,20 +17,34 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 
 export default function Result() {
   const {
+    user,
     attendance,
     SERVER,
     users,
+    setUsers,
     graphData,
     subjectsGraphData,
     setAttendance,
     setGraphData,
     setSubjectsGraphData,
   } = useContext(DataContext);
+  const navigate = useNavigate();
+  const [excludeOtherSubjects, setExcludeOtherSubjects] = useState(true);
+  const location = useLocation();
+  const [paramas, setParams] = useState(location.search);
+
+  const [searchParams] = useSearchParams();
+  let from = searchParams.get("from");
+  let to = searchParams.get("to");
+  let month = searchParams.get("month");
+  let rollno = searchParams.get("rollno");
 
   const [selectedSubject, setSelectedSubject] = useState(0);
+
   useEffect(() => {
     return () => {
       setGraphData([]);
@@ -32,6 +52,173 @@ export default function Result() {
       setAttendance(null);
     };
   }, []);
+
+  const getAttendance = useCallback(
+    (body) => {
+      let graphs = JSON.parse(localStorage.getItem("graphs") || "{}");
+      if (graphs[rollno.toLowerCase()]) {
+        setGraphData(FormatGraphData(graphs[rollno.toLowerCase()]));
+        setSubjectsGraphData(FormatSubjects(graphs[rollno.toLowerCase()]));
+      } else {
+        HandleGraphData();
+      }
+      axios
+        .post(`${SERVER}/attendance`, {
+          user: users[0].user,
+          password: users[0].password,
+          rollNo: rollno,
+          cookie: users[0].cookie,
+          excludeOtherSubjects,
+          expire: users[0].expire,
+          ...body,
+        })
+        .then((res) => {
+          console.log(res.data);
+          if (res.data.cookie) {
+            setUsers([
+              {
+                ...users[0],
+                cookie: res.data.cookie,
+                role: res.data.role,
+                expire: res.data.expire,
+              },
+            ]);
+          }
+          setAttendance(res.data);
+        });
+    },
+    [rollno]
+  );
+
+  useEffect(() => {
+    console.log(from, to, rollno, month);
+
+    if (month) {
+      console.log("by month");
+      let date = new Date(month);
+      date.setHours(0, 0, 0, 0);
+      date.setMinutes(0);
+      getAttendance({
+        from: date.getTime(),
+        to: "",
+      });
+    } else {
+      console.log("by from and to");
+      let fromTime = new Date(from).getTime();
+      let toTime = new Date(to).getTime();
+      console.log(from, to);
+      getAttendance({
+        from: fromTime,
+        to: toTime,
+      });
+    }
+  }, [from, to, rollno, month, getAttendance]);
+
+  function HandleGraphData() {
+    axios
+      .post(`${SERVER}/graph`, {
+        user: users[0].user,
+        password: users[0].password,
+        rollNo: rollno,
+        cookie: users[0].cookie,
+        expire: users[0].cookie,
+      })
+      .then((res) => {
+        console.log("graph: ", res.data);
+        setGraphData(FormatGraphData(res.data.arr));
+        setSubjectsGraphData(FormatSubjects(res.data.arr));
+
+        let graphs = JSON.parse(localStorage.getItem("graphs") || "{}");
+        graphs[user.toLowerCase()] = res.data.arr;
+        localStorage.setItem("graphs", JSON.stringify(graphs));
+
+        if (res.data.cookie) {
+          setUsers([
+            {
+              ...users[0],
+              cookie: res.data.cookie,
+              role: res.data.role,
+              expire: res.data.expire,
+            },
+          ]);
+        }
+      });
+  }
+
+  function getTodayAttendace(e) {
+    let date = new Date();
+    date.setHours(0, 0, 0, 0);
+    date.setMinutes(0);
+    getAttendance({
+      from: date.getTime(),
+      to: date.getTime(),
+    });
+  }
+
+  function getYesterdayAttendace(e) {
+    console.log("get Yesterday attendance");
+    let date = new Date();
+    date.setDate(date.getDate() - 1);
+    date.setHours(0, 0, 0, 0);
+    date.setMinutes(0);
+    console.log(date);
+    getAttendance({
+      from: date.getTime(),
+      to: date.getTime(),
+    });
+  }
+
+  function getThisWeekAttendace(e) {
+    /*
+        - 6 and + 1 are for making monday as first of week, instead of sunday.
+        if todya is sunday, means day is 0, so we subtract 6 to get prv monday
+        else subtract the day + 1 to get monday
+    */
+
+    let date = new Date();
+    let day = date.getDay();
+    let from = new Date(date);
+    let to = new Date(date);
+    if (day == 0) {
+      from.setDate(date.getDate() - 6);
+      to.setDate(date.getDate());
+    } else {
+      from.setDate(date.getDate() - day + 1);
+      to.setDate(date.getDate() + (6 - day + 1));
+    }
+    from.setHours(0, 0, 0, 0);
+    from.setMinutes(0);
+    to.setHours(0, 0, 0, 0);
+    to.setMinutes(0);
+    console.log(from, to);
+    getAttendance({
+      from: from.getTime(),
+      to: to.getTime(),
+    });
+  }
+
+  function getBWeekAttendace(e) {
+    let date = new Date();
+    let day = date.getDay();
+    let from = new Date(date);
+    let to = new Date(date);
+    if (day == 0) {
+      from.setDate(date.getDate() - 6 - 7);
+      to.setDate(date.getDate() - 6 - 1);
+    } else {
+      from.setDate(date.getDate() - day - 7 + 1);
+      to.setDate(date.getDate() - day + 1 + 1);
+    }
+    from.setHours(0, 0, 0, 0);
+    from.setMinutes(0);
+    to.setHours(0, 0, 0, 0);
+    to.setMinutes(0);
+    console.log(from, to);
+    getAttendance({
+      from: from.getTime(),
+      to: to.getTime(),
+    });
+  }
 
   if (attendance == null) {
     return (
@@ -203,6 +390,7 @@ export default function Result() {
             <p className="label">Roll No</p>
             <p className="value">{attendance.bio.RollNo}</p>
           </div>
+          {/* <div className="bio-row"> */}
           <div className="course">
             <p className="label">Course</p>
             <p className="value">{attendance.bio.Course}</p>
@@ -211,6 +399,7 @@ export default function Result() {
             <p className="label">Semester</p>
             <p className="value">{attendance.bio.Semester.substr(0, 2)}</p>
           </div>
+          {/* </div> */}
         </div>
 
         <div className="results-table">
@@ -243,4 +432,40 @@ export default function Result() {
       </div>
     </div>
   );
+}
+
+function FormatGraphData(data) {
+  return data.map((item, i) => {
+    return {
+      // name: "week " + i,
+      name: FormatDate(item.week),
+      attend: item.total.attend,
+      held: item.total.held,
+      percent: item.total.percent,
+    };
+  });
+}
+
+function FormatSubjects(data) {
+  let temp = [];
+  data[0].data.forEach((item, i) => {
+    temp.push([]);
+  });
+  data.forEach((item, i) => {
+    item.data.forEach((subject, j) => {
+      subject.name = FormatDate(item.week);
+      temp[j].push(subject);
+    });
+  });
+  console.log(temp);
+  return temp;
+}
+
+function FormatDate(date) {
+  let d = new Date(date);
+  const day = String(d.getUTCDate());
+  const month = String(d.getUTCMonth() + 1);
+  const year = String(d.getUTCFullYear());
+  // return `${day}/${month}/${year}`;
+  return `${day}/${month}`;
 }
