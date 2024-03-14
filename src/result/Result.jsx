@@ -25,32 +25,6 @@ export default function Result() {
   } = useContext(DataContext);
 
   const [selectedSubject, setSelectedSubject] = useState(0);
-
-  // const [graphData, setGraphData] = useState([]);
-
-  // useEffect(() => {
-  //   let all = JSON.parse(localStorage.getItem("graph"));
-  //   console.log(all);
-  //   if (all) {
-  //     setGraphData(
-  //       all.map((item, i) => {
-  //         return {
-  //           // name: "week " + i,
-  //           name: FormatDate(item.week),
-  //           attend: item.total.attend,
-  //           held: item.total.held,
-  //           percent: item.total.percent,
-  //           // ML: item.data[0].attend,
-  //           // CD: item.data[1].attend,
-  //           // CNS: item.data[2].attend,
-  //           // OOAD: item.data[3].attend,
-  //           // DLD: item.data[4].attend,
-  //         };
-  //       })
-  //     );
-  //   }
-  // }, []);
-
   useEffect(() => {
     return () => {
       setGraphData([]);
