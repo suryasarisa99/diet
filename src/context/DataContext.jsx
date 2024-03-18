@@ -11,6 +11,8 @@ export default function DataProvider({ children }) {
   const [users, setUsers] = useState(
     JSON.parse(localStorage.getItem("users") || "[]")
   );
+  const [rollno, setRollno] = useState("");
+
   const [graphData, setGraphData] = useState([]);
   const [subjectsGraphData, setSubjectsGraphData] = useState([]);
   const SERVER = "https://diet-b.vercel.app";
@@ -20,6 +22,7 @@ export default function DataProvider({ children }) {
   useEffect(() => {}, []);
   useEffect(() => {
     localStorage.setItem("users", JSON.stringify(users));
+    setRollno(users[0].user);
   }, [users]);
 
   function saveUser(data) {
@@ -47,6 +50,8 @@ export default function DataProvider({ children }) {
         SERVER,
         subjectsGraphData,
         setSubjectsGraphData,
+        rollno,
+        setRollno,
       }}
     >
       {children}

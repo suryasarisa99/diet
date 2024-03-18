@@ -21,7 +21,6 @@ import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 
 export default function Result() {
   const {
-    user,
     attendance,
     SERVER,
     users,
@@ -146,7 +145,7 @@ export default function Result() {
         setSubjectsGraphData(FormatSubjects(res.data.arr));
 
         let graphs = JSON.parse(localStorage.getItem("graphs") || "{}");
-        graphs[user.toLowerCase()] = res.data.arr;
+        graphs[rollno.toLowerCase()] = res.data.arr;
         localStorage.setItem("graphs", JSON.stringify(graphs));
 
         if (res.data.cookie) {

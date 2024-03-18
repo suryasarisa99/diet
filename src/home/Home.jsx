@@ -23,9 +23,10 @@ export default function Home() {
     setGraphData,
     ubjectsGraphData,
     setSubjectsGraphData,
+    rollno,
+    setRollno,
   } = useContext(DataContext);
 
-  const [user, setUser] = useState(users[0].user);
   const [month, setMonth] = useState("");
   const inputFrom = useRef(null);
   const inputTo = useRef(null);
@@ -36,10 +37,10 @@ export default function Home() {
   const navigate = useNavigate();
 
   const week = [
-    { name: "b Weeek", to: `/result?rollno=${user}&week=bweek` },
-    { name: "This Week", to: `/result?rollno=${user}&week=this` },
-    { name: "Yesterday", to: `/result?rollno=${user}&week=yesterday` },
-    { name: "Today", to: `/result?rollno=${user}&week=today` },
+    { name: "b Weeek", to: `/result?rollno=${rollno}&week=bweek` },
+    { name: "This Week", to: `/result?rollno=${rollno}&week=this` },
+    { name: "Yesterday", to: `/result?rollno=${rollno}&week=yesterday` },
+    { name: "Today", to: `/result?rollno=${rollno}&week=today` },
   ];
   const Months = [
     "January",
@@ -68,11 +69,11 @@ export default function Home() {
   }, []);
 
   function handleAttendance() {
-    navigate(`/result?rollno=${user}&from=${date.from}&to=${date.to}`);
+    navigate(`/result?rollno=${rollno}&from=${date.from}&to=${date.to}`);
   }
 
   function onMonthChange(e) {
-    navigate(`/result/?rollno=${user}&month=${e.target.value}`);
+    navigate(`/result/?rollno=${rollno}&month=${e.target.value}`);
   }
 
   return (
@@ -82,11 +83,11 @@ export default function Home() {
       <input
         type="text"
         placeholder="ID"
-        value={user}
+        value={rollno}
         className="rollNo-input"
         autoCorrect="off"
         spellCheck={false}
-        onChange={(e) => setUser(e.target.value)}
+        onChange={(e) => setRollno(e.target.value)}
       />
 
       {/* <input
