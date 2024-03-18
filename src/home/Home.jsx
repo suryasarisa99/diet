@@ -35,12 +35,12 @@ export default function Home() {
   const monthRef = useRef(null);
   const navigate = useNavigate();
 
-  // const week = [
-  //   { name: "b Weeek", event: getBWeekAttendace },
-  //   { name: "This Week", event: getThisWeekAttendace },
-  //   { name: "Yesterday", event: getYesterdayAttendace },
-  //   { name: "Today", event: getTodayAttendace },
-  // ];
+  const week = [
+    { name: "b Weeek", to: `/result?rollno=${user}&week=bweek` },
+    { name: "This Week", to: `/result?rollno=${user}&week=this` },
+    { name: "Yesterday", to: `/result?rollno=${user}&week=yesterday` },
+    { name: "Today", to: `/result?rollno=${user}&week=today` },
+  ];
   const Months = [
     "January",
     "February",
@@ -64,7 +64,7 @@ export default function Home() {
   useEffect(() => {
     // how to scroll to last month, without any animation
     // lastMonth.current.scrollIntoView({ block: "end" });
-    // weekLastItem.current.scrollIntoView({ block: "end" });
+    weekLastItem.current.scrollIntoView({ block: "end" });
   }, []);
 
   function handleAttendance() {
@@ -174,24 +174,30 @@ export default function Home() {
           />
         </div>
       </div>
-      {/* 
-      <div className="section">
-        {week.map((w, week_index) => {
-          if (week_index == week.length - 1) {
-            return (
-              <div ref={weekLastItem} key={w.name} onClick={w.event}>
-                {w.name}
-              </div>
-            );
-          } else {
-            return (
-              <div key={w.name} onClick={w.event}>
-                {w.name}
-              </div>
-            );
-          }
-        })}
-      </div> */}
+
+      <div className="section-outer">
+        <div className="section">
+          {week.map((w, week_index) => {
+            if (week_index == week.length - 1) {
+              return (
+                <div
+                  ref={weekLastItem}
+                  key={w.name}
+                  onClick={() => navigate(w.to)}
+                >
+                  {w.name}
+                </div>
+              );
+            } else {
+              return (
+                <div key={w.name} onClick={() => navigate(w.to)}>
+                  {w.name}
+                </div>
+              );
+            }
+          })}
+        </div>
+      </div>
       <button onClick={handleAttendance} className="attendance-button">
         Attendance
       </button>

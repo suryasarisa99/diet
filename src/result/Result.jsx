@@ -32,6 +32,7 @@ export default function Result() {
     setGraphData,
     setSubjectsGraphData,
   } = useContext(DataContext);
+
   const navigate = useNavigate();
   const [excludeOtherSubjects, setExcludeOtherSubjects] = useState(true);
   const location = useLocation();
@@ -42,6 +43,7 @@ export default function Result() {
   let to = searchParams.get("to");
   let month = searchParams.get("month");
   let rollno = searchParams.get("rollno");
+  let week = searchParams.get("week");
 
   const [selectedSubject, setSelectedSubject] = useState(0);
 
@@ -102,7 +104,7 @@ export default function Result() {
         from: date.getTime(),
         to: "",
       });
-    } else {
+    } else if (from || to) {
       console.log("by from and to");
       let fromTime = new Date(from).getTime();
       let toTime = new Date(to).getTime();
@@ -111,6 +113,21 @@ export default function Result() {
         from: fromTime,
         to: toTime,
       });
+    } else {
+      switch (week) {
+        case "today":
+          getTodayAttendace();
+          break;
+        case "yesterday":
+          getYesterdayAttendace();
+          break;
+        case "this":
+          getThisWeekAttendace();
+          break;
+        case "bweek":
+          getBWeekAttendace();
+          break;
+      }
     }
   }, [from, to, rollno, month, getAttendance]);
 
@@ -145,7 +162,7 @@ export default function Result() {
       });
   }
 
-  function getTodayAttendace(e) {
+  function getTodayAttendace() {
     let date = new Date();
     date.setHours(0, 0, 0, 0);
     date.setMinutes(0);
@@ -155,7 +172,7 @@ export default function Result() {
     });
   }
 
-  function getYesterdayAttendace(e) {
+  function getYesterdayAttendace() {
     console.log("get Yesterday attendance");
     let date = new Date();
     date.setDate(date.getDate() - 1);
@@ -168,7 +185,7 @@ export default function Result() {
     });
   }
 
-  function getThisWeekAttendace(e) {
+  function getThisWeekAttendace() {
     /*
         - 6 and + 1 are for making monday as first of week, instead of sunday.
         if todya is sunday, means day is 0, so we subtract 6 to get prv monday
@@ -197,7 +214,7 @@ export default function Result() {
     });
   }
 
-  function getBWeekAttendace(e) {
+  function getBWeekAttendace() {
     let date = new Date();
     let day = date.getDay();
     let from = new Date(date);

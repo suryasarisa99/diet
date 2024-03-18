@@ -174,7 +174,12 @@
     color: white;
   }
 
+  .section-outer {
+    width: 100%;
+  }
+
   .section {
+    width: 100%;
     display: flex;
     flex-direction: row;
     overflow-x: auto;
