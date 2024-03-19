@@ -88,6 +88,9 @@ export default function Result() {
             ]);
           }
           setAttendance(res.data);
+        })
+        .catch((e) => {
+          alert(e.message);
         });
     },
     [rollno]
@@ -96,6 +99,15 @@ export default function Result() {
   useEffect(() => {
     console.log(from, to, rollno, month);
 
+    try {
+      fetchData();
+    } catch (e) {
+      alert(e.message);
+      fetchData();
+    }
+  }, [from, to, rollno, month, getAttendance]);
+
+  function fetchData() {
     if (month) {
       console.log("by month");
       let date = new Date(month);
@@ -130,7 +142,7 @@ export default function Result() {
           break;
       }
     }
-  }, [from, to, rollno, month, getAttendance]);
+  }
 
   function HandleGraphData() {
     axios
