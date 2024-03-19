@@ -103,7 +103,7 @@ export default function Result() {
         from: date.getTime(),
         to: "",
       });
-    } else if (from || to) {
+    } else if (!week) {
       console.log("by from and to");
       let fromTime = new Date(from).getTime();
       let toTime = new Date(to).getTime();
