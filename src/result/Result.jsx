@@ -66,15 +66,21 @@ export default function Result() {
         HandleGraphData();
       }
       axios
-        .post(`${SERVER}/attendance`, {
-          user: users[0].user,
-          password: users[0].password,
-          rollNo: rollno,
-          cookie: users[0].cookie,
-          excludeOtherSubjects,
-          expire: users[0].expire,
-          ...body,
-        })
+        .post(
+          `${SERVER}/attendance`,
+          {
+            user: users[0].user,
+            password: users[0].password,
+            rollNo: rollno,
+            cookie: users[0].cookie,
+            excludeOtherSubjects,
+            expire: users[0].expire,
+            ...body,
+          },
+          {
+            timeout: 0,
+          }
+        )
         .then((res) => {
           console.log(res.data);
           if (res.data.cookie) {
@@ -91,6 +97,7 @@ export default function Result() {
         })
         .catch((e) => {
           alert(e.message);
+          console.log("error in attendance: ", e);
         });
     },
     [rollno]
@@ -102,7 +109,7 @@ export default function Result() {
     try {
       fetchData();
     } catch (e) {
-      alert(e.message);
+      alert(`Error: ${e.message}, more: ${e.stack}`);
       fetchData();
     }
   }, [from, to, rollno, month, getAttendance]);
@@ -146,13 +153,19 @@ export default function Result() {
 
   function HandleGraphData() {
     axios
-      .post(`${SERVER}/graph`, {
-        user: users[0].user,
-        password: users[0].password,
-        rollNo: rollno,
-        cookie: users[0].cookie,
-        expire: users[0].cookie,
-      })
+      .post(
+        `${SERVER}/graph`,
+        {
+          user: users[0].user,
+          password: users[0].password,
+          rollNo: rollno,
+          cookie: users[0].cookie,
+          expire: users[0].expire,
+        },
+        {
+          timeout: 0,
+        }
+      )
       .then((res) => {
         console.log("graph: ", res.data);
         setGraphData(FormatGraphData(res.data.arr));
