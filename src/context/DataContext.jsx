@@ -19,8 +19,8 @@ export default function DataProvider({ children }) {
   // const SERVER = "http://localhost:3000";
   const [attendance, setAttendance] = useState(null);
 
-  useEffect(() => {}, []);
   useEffect(() => {
+    if (users.length === 0) return;
     localStorage.setItem("users", JSON.stringify(users));
     setRollno(users[0].user);
   }, [users]);
