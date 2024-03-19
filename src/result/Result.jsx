@@ -37,6 +37,8 @@ export default function Result() {
   const location = useLocation();
   const [paramas, setParams] = useState(location.search);
 
+  const [sortOn, setSortOn] = useState("percent");
+
   const [searchParams] = useSearchParams();
   let from = searchParams.get("from");
   let to = searchParams.get("to");
@@ -420,12 +422,45 @@ export default function Result() {
 
         <div className="results-table">
           <div className={"row head"}>
-            <div className="cell subject">Subject</div>
-            <div className="cell cnt">Held</div>
-            <div className="cell cnt">Attend</div>
-            <div className="cell percentage">Percent</div>
+            <div
+              className={
+                "cell subject " + (sortOn == "subject" ? "active" : "")
+              }
+              onClick={() => setSortOn("subject")}
+            >
+              Subject
+            </div>
+            <div
+              className={"cell cnt " + (sortOn == "held" ? "active" : "")}
+              onClick={() => setSortOn("held")}
+            >
+              Held
+            </div>
+            <div
+              className={"cell cnt " + (sortOn == "attend" ? "active" : "")}
+              onClick={() => setSortOn("attend")}
+            >
+              Attend
+            </div>
+            <div
+              className={
+                "cell percentage " + (sortOn == "percent" ? "active" : "")
+              }
+              onClick={() => setSortOn("percent")}
+            >
+              Percent
+            </div>
           </div>
-          {attendance.data.map((row, i) => {
+          {(!sortOn
+            ? attendance.data
+            : attendance.data.sort((a, b) => {
+                if (sortOn == "subject") {
+                  return a.subject.localeCompare(b.subject);
+                } else {
+                  return b[sortOn] - a[sortOn];
+                }
+              })
+          ).map((row, i) => {
             return (
               <div
                 key={row.subject}

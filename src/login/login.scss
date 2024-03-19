@@ -523,6 +523,10 @@ body {
         .cell {
           border-color: black;
           padding: 7px;
+
+          &.active {
+            text-decoration: underline 2px solid;
+          }
         }
       }
     }
